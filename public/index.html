@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>助成金・補助金 AIアシスタント</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f5f3;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --accent: #1D9E75;
+    --accent-light: #E1F5EE;
+    --user-bg: #1a1a1a;
+    --user-text: #ffffff;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* ヘッダー */
+  header {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px;
+  }
+
+  .header-text h1 { font-size: 15px; font-weight: 600; }
+  .header-text p { font-size: 12px; color: var(--text-muted); }
+
+  .status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--accent);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+
+  /* メインエリア */
+  main {
+    width: 100%; max-width: 760px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    padding: 0 16px;
+  }
+
+  /* メッセージ一覧 */
+  #messages {
+    flex: 1;
+    padding: 24px 0;
+    display: flex; flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .avatar.ai { background: var(--accent-light); color: var(--accent); }
+  .avatar.user { background: var(--user-bg); color: var(--user-text); }
+
+  .bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .bubble.ai {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+  }
+  .bubble.user {
+    background: var(--user-bg);
+    color: var(--user-text);
+    border-top-right-radius: 4px;
+  }
+
+  .sources {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex; align-items: flex-start; gap: 4px;
+  }
+  .sources svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ウェルカムカード */
+  .welcome {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .welcome h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .welcome p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+
+  .suggestions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .suggestion-btn {
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.4;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .suggestion-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* タイピングインジケーター */
+  .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+  .typing span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted);
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,80%,100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+  }
+
+  /* 入力エリア */
+  #input-wrap {
+    padding: 16px 0 24px;
+    position: sticky;
+    bottom: 0;
+    background: var(--bg);
+  }
+
+  .input-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 10px 10px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: border-color 0.2s;
+  }
+  .input-box:focus-within { border-color: var(--accent); }
+
+  textarea {
+    flex: 1;
+    border: none; outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    resize: none;
+    line-height: 1.5;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  textarea::placeholder { color: var(--text-muted); }
+
+  #send-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  #send-btn:hover { opacity: 0.85; }
+  #send-btn:active { transform: scale(0.95); }
+  #send-btn:disabled { background: var(--border); cursor: not-allowed; }
+  #send-btn svg { width: 16px; height: 16px; }
+
+  .input-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  /* エラー */
+  .error-bubble {
+    background: #fff5f5;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    max-width: 75%;
+  }
+
+  @media (max-width: 600px) {
+    .suggestions { grid-template-columns: 1fr; }
+    .bubble { max-width: 88%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">💰</div>
+  <div class="header-text">
+    <h1>助成金・補助金 AIアシスタント</h1>
+    <p>最新情報を参照してリアルタイムで回答</p>
+  </div>
+  <div class="status">
+    <div class="status-dot"></div>
+    オンライン
+  </div>
+</header>
+
+<main>
+  <div id="messages">
+    <div class="msg">
+      <div class="avatar ai">AI</div>
+      <div class="bubble ai">
+        <div class="welcome">
+          <h2>こんにちは！</h2>
+          <p>Google Driveの最新PDFを参照して、あなたに合った助成金・補助金をご案内します。業種・目的・地域などを教えていただけると、より的確にご紹介できます。</p>
+          <div class="suggestions">
+            <button class="suggestion-btn" onclick="suggest(this)">小規模事業者向けの補助金を教えて</button>
+            <button class="suggestion-btn" onclick="suggest(this)">今月締め切りの助成金は？</button>
+            <button class="suggestion-btn" onclick="suggest(this)">IT導入に使える補助金は？</button>
+            <button class="suggestion-btn" onclick="suggest(this)">飲食店が使える支援制度を教えて</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="input-wrap">
+    <div class="input-box">
+      <textarea id="user-input" placeholder="業種・目的・地域などを書いて質問してください…" rows="1"></textarea>
+      <button id="send-btn" aria-label="送信" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+    <p class="input-hint">Enter で送信 / Shift+Enter で改行</p>
+  </div>
+</main>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const history = [];
+
+  // テキストエリア自動リサイズ
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = inputEl.scrollHeight + 'px';
+    sendBtn.disabled = !inputEl.value.trim();
+  });
+
+  function suggest(btn) {
+    inputEl.value = btn.textContent;
+    inputEl.dispatchEvent(new Event('input'));
+    send();
+  }
+
+  function addMsg(role, content, sources) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + (role === 'user' ? 'user' : '');
+
+    const av = document.createElement('div');
+    av.className = 'avatar ' + (role === 'user' ? 'user' : 'ai');
+    av.textContent = role === 'user' ? '私' : 'AI';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
+    bubble.textContent = content;
+
+    if (sources && sources.length) {
+      const src = document.createElement('div');
+      src.className = 'sources';
+      src.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>参照: ${sources.join(', ')}`;
+      bubble.appendChild(src);
+    }
+
+    wrap.appendChild(av);
+    wrap.appendChild(bubble);
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return bubble;
+  }
+
+  function addThinking() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg';
+    wrap.innerHTML = `<div class="avatar ai">AI</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return wrap;
+  }
+
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+
+    const thinking = addThinking();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+
+      const data = await res.json();
+      thinking.remove();
+
+      if (!res.ok) throw new Error(data.error || '不明なエラー');
+
+      addMsg('assistant', data.answer, data.usedFiles);
+      history.push({ role: 'assistant', content: data.answer });
+
+    } catch (e) {
+      thinking.remove();
+      const wrap = document.createElement('div');
+      wrap.className = 'msg';
+      wrap.innerHTML = `<div class="avatar ai">AI</div><div class="error-bubble">⚠️ エラーが発生しました: ${e.message}</div>`;
+      messagesEl.appendChild(wrap);
+    }
+
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+</script>
+</body>
+</html>

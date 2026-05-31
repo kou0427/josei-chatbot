@@ -1,0 +1,10 @@
+{
+  "name": "josei-hojokin-chatbot",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "googleapis": "^144.0.0",
+    "pdf-parse": "^1.1.1"
+  }
+}
