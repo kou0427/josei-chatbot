@@ -3,400 +3,570 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>助成金・補助金 AIアシスタント</title>
+<title>助成金・補助金アシスタント</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #f5f5f3;
-    --surface: #ffffff;
-    --border: rgba(0,0,0,0.1);
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --accent: #1D9E75;
-    --accent-light: #E1F5EE;
-    --user-bg: #1a1a1a;
-    --user-text: #ffffff;
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
+:root {
+  --bg: #f4f3f0;
+  --sidebar: #1c1c1e;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --text: #1c1c1e;
+  --text-muted: #8a8a8e;
+  --text-light: #aeaeb2;
+  --accent: #5b5bd6;
+  --accent-light: #ededfc;
+  --user-bg: #1c1c1e;
+  --user-text: #ffffff;
+  --sidebar-text: rgba(255,255,255,0.55);
+  --sidebar-text-active: #ffffff;
+  --sidebar-hover: rgba(255,255,255,0.06);
+  --tag-bg: rgba(255,255,255,0.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
 
-  html, body { height: 100%; }
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
+/* レイアウト */
+#layout { display: flex; height: 100vh; overflow: hidden; }
 
-  /* ヘッダー */
-  header {
-    width: 100%;
-    padding: 16px 24px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+/* サイドバー */
+#sidebar {
+  width: 220px;
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 20px 0;
+}
 
-  .logo {
-    width: 36px; height: 36px;
-    background: var(--accent);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 18px;
-  }
+.sidebar-logo {
+  padding: 0 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 16px;
+}
 
-  .header-text h1 { font-size: 15px; font-weight: 600; }
-  .header-text p { font-size: 12px; color: var(--text-muted); }
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 14px; height: 14px; }
 
-  .status {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: var(--accent);
-  }
-  .status-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
-  }
+.logo-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sidebar-text-active);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 10px;
+  color: var(--sidebar-text);
+  margin-top: 2px;
+}
 
-  /* メインエリア */
-  main {
-    width: 100%; max-width: 760px;
-    flex: 1;
-    display: flex; flex-direction: column;
-    padding: 0 16px;
-  }
+.sidebar-section {
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
 
-  /* メッセージ一覧 */
-  #messages {
-    flex: 1;
-    padding: 24px 0;
-    display: flex; flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-  }
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
 
-  .msg { display: flex; gap: 10px; align-items: flex-start; }
-  .msg.user { flex-direction: row-reverse; }
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+}
+.sidebar-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text-active); }
+.sidebar-item.active { background: rgba(91,91,214,0.18); color: var(--sidebar-text-active); }
+.sidebar-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
+.sidebar-item.active svg { opacity: 1; }
 
-  .avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 600;
-    flex-shrink: 0;
-  }
-  .avatar.ai { background: var(--accent-light); color: var(--accent); }
-  .avatar.user { background: var(--user-bg); color: var(--user-text); }
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 12px 18px; }
 
-  .bubble {
-    max-width: 75%;
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .bubble.ai {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-top-left-radius: 4px;
-  }
-  .bubble.user {
-    background: var(--user-bg);
-    color: var(--user-text);
-    border-top-right-radius: 4px;
-  }
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 0 12px;
+}
 
-  .sources {
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--text-muted);
-    display: flex; align-items: flex-start; gap: 4px;
-  }
-  .sources svg { flex-shrink: 0; margin-top: 1px; }
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.04);
+  font-size: 11px;
+  color: var(--sidebar-text);
+}
+.status-dot-green {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #30d158;
+  flex-shrink: 0;
+}
 
-  /* ウェルカムカード */
-  .welcome {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-  }
-  .welcome h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-  .welcome p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+/* メインエリア */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
 
-  .suggestions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .suggestion-btn {
-    padding: 10px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    color: var(--text);
-    cursor: pointer;
-    text-align: left;
-    line-height: 1.4;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .suggestion-btn:hover {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
+/* トップバー */
+#topbar {
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
 
-  /* タイピングインジケーター */
-  .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
-  .typing span {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-muted);
-    animation: bounce 1.2s infinite;
-  }
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce {
-    0%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-  }
+.topbar-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.topbar-breadcrumb span { color: var(--text); font-weight: 500; }
+.breadcrumb-sep { color: var(--text-light); }
 
-  /* 入力エリア */
-  #input-wrap {
-    padding: 16px 0 24px;
-    position: sticky;
-    bottom: 0;
-    background: var(--bg);
-  }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .input-box {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px 10px 10px 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    transition: border-color 0.2s;
-  }
-  .input-box:focus-within { border-color: var(--accent); }
+.chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface);
+  font-family: var(--font-mono);
+}
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; background: #30d158; }
 
-  textarea {
-    flex: 1;
-    border: none; outline: none;
-    background: transparent;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--text);
-    resize: none;
-    line-height: 1.5;
-    max-height: 160px;
-    overflow-y: auto;
-  }
-  textarea::placeholder { color: var(--text-muted); }
+/* チャットエリア */
+#chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
-  #send-btn {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    border: none;
-    background: var(--accent);
-    color: white;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  #send-btn:hover { opacity: 0.85; }
-  #send-btn:active { transform: scale(0.95); }
-  #send-btn:disabled { background: var(--border); cursor: not-allowed; }
-  #send-btn svg { width: 16px; height: 16px; }
+/* メッセージ */
+.msg-group { margin-bottom: 28px; }
 
-  .input-hint {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 8px;
-  }
+.msg-meta {
+  font-size: 11px;
+  color: var(--text-light);
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.msg-group.user .msg-meta { text-align: right; }
 
-  /* エラー */
-  .error-bubble {
-    background: #fff5f5;
-    border: 1px solid #fca5a5;
-    color: #b91c1c;
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 13px;
-    max-width: 75%;
-  }
+.msg-bubble {
+  display: inline-block;
+  max-width: 72%;
+  padding: 13px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
-  @media (max-width: 600px) {
-    .suggestions { grid-template-columns: 1fr; }
-    .bubble { max-width: 88%; }
-  }
+.msg-group.ai .msg-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+  color: var(--text);
+}
+
+.msg-group.user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.msg-group.user .msg-bubble {
+  background: var(--user-bg);
+  color: var(--user-text);
+  border-top-right-radius: 4px;
+}
+
+/* ウェルカム */
+.welcome-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 28px;
+}
+.welcome-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+.welcome-title { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 8px; }
+.welcome-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+
+.suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.suggestion {
+  padding: 11px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.45;
+  font-family: var(--font);
+  transition: border-color 0.12s, background 0.12s;
+}
+.suggestion:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+/* タイピング */
+.typing-wrap { display: flex; align-items: center; gap: 5px; padding: 14px 16px; }
+.typing-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-light);
+  animation: tdot 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-5px);opacity:1} }
+
+/* 入力エリア */
+#input-area {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 10px 10px 16px;
+  transition: border-color 0.15s;
+}
+.input-row:focus-within { border-color: var(--accent); }
+
+#user-input {
+  flex: 1;
+  border: none; outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-family: var(--font);
+  color: var(--text);
+  resize: none;
+  line-height: 1.5;
+  max-height: 140px;
+  overflow-y: auto;
+}
+#user-input::placeholder { color: var(--text-light); }
+
+#send-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.12s;
+}
+#send-btn:hover { opacity: 0.85; }
+#send-btn:disabled { background: var(--border); cursor: not-allowed; }
+#send-btn svg { width: 14px; height: 14px; }
+
+.input-hint { font-size: 11px; color: var(--text-light); margin-top: 8px; font-family: var(--font-mono); }
+
+/* エラー */
+.error-msg {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 13px;
+  display: inline-block;
+  max-width: 72%;
+}
+
+@media (max-width: 640px) {
+  #sidebar { display: none; }
+  .suggestions { grid-template-columns: 1fr; }
+  .msg-bubble { max-width: 88%; }
+}
 </style>
 </head>
 <body>
+<div id="layout">
 
-<header>
-  <div class="logo">💰</div>
-  <div class="header-text">
-    <h1>助成金・補助金 AIアシスタント</h1>
-    <p>最新情報を参照してリアルタイムで回答</p>
-  </div>
-  <div class="status">
-    <div class="status-dot"></div>
-    オンライン
-  </div>
-</header>
+  <!-- サイドバー -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
+          <path d="M2 4h12M2 8h8M2 12h10"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">補助金ナビ</div>
+        <div class="logo-sub">AI Assistant</div>
+      </div>
+    </div>
 
-<main>
-  <div id="messages">
-    <div class="msg">
-      <div class="avatar ai">AI</div>
-      <div class="bubble ai">
-        <div class="welcome">
-          <h2>こんにちは！</h2>
-          <p>Google Driveの最新PDFを参照して、あなたに合った助成金・補助金をご案内します。業種・目的・地域などを教えていただけると、より的確にご紹介できます。</p>
-          <div class="suggestions">
-            <button class="suggestion-btn" onclick="suggest(this)">小規模事業者向けの補助金を教えて</button>
-            <button class="suggestion-btn" onclick="suggest(this)">今月締め切りの助成金は？</button>
-            <button class="suggestion-btn" onclick="suggest(this)">IT導入に使える補助金は？</button>
-            <button class="suggestion-btn" onclick="suggest(this)">飲食店が使える支援制度を教えて</button>
+    <div class="sidebar-section">
+      <div class="sidebar-label">メニュー</div>
+      <div class="sidebar-item active">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z"/>
+        </svg>
+        AIチャット
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <path d="M5 8h6M5 5h3M5 11h4"/>
+        </svg>
+        補助金一覧
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
+        </svg>
+        締め切り管理
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">履歴</div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M3 4h10M3 8h7M3 12h8"/>
+        </svg>
+        小規模事業者の補助金
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M3 4h10M3 8h7M3 12h8"/>
+        </svg>
+        IT導入補助金について
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="status-badge">
+        <div class="status-dot-green"></div>
+        最新データ同期済み
+      </div>
+    </div>
+  </aside>
+
+  <!-- メイン -->
+  <div id="main">
+    <div id="topbar">
+      <div class="topbar-breadcrumb">
+        補助金ナビ
+        <span class="breadcrumb-sep">/</span>
+        <span>AIチャット</span>
+      </div>
+      <div class="topbar-right">
+        <div class="chip">
+          <div class="chip-dot"></div>
+          v1.0
+        </div>
+      </div>
+    </div>
+
+    <div id="chat-area">
+      <div class="msg-group ai">
+        <div class="msg-meta">Assistant</div>
+        <div class="msg-bubble">
+          <div class="welcome-card">
+            <div class="welcome-eyebrow">AI Assistant</div>
+            <div class="welcome-title">助成金・補助金を探しましょう</div>
+            <div class="welcome-desc">Google Driveの最新データをもとに、あなたの状況に合った補助金・助成金をご案内します。業種や目的を教えてください。</div>
+            <div class="suggestions">
+              <button class="suggestion" onclick="suggest(this)">小規模事業者向けの補助金を教えて</button>
+              <button class="suggestion" onclick="suggest(this)">今月締め切りの助成金は？</button>
+              <button class="suggestion" onclick="suggest(this)">IT導入に使える補助金は？</button>
+              <button class="suggestion" onclick="suggest(this)">飲食店が使える支援制度を教えて</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="input-wrap">
-    <div class="input-box">
-      <textarea id="user-input" placeholder="業種・目的・地域などを書いて質問してください…" rows="1"></textarea>
-      <button id="send-btn" aria-label="送信" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
-        </svg>
-      </button>
+    <div id="input-area">
+      <div class="input-row">
+        <textarea id="user-input" placeholder="業種や目的を教えてください..." rows="1"></textarea>
+        <button id="send-btn" disabled aria-label="送信">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2L7 9M14 2L9 14l-2-5-5-2 12-5z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">Shift + Enter で送信 &nbsp;/&nbsp; Enter で改行</div>
     </div>
-    <p class="input-hint">Enter で送信 / Shift+Enter で改行</p>
   </div>
-</main>
+</div>
 
 <script>
-  const messagesEl = document.getElementById('messages');
-  const inputEl = document.getElementById('user-input');
-  const sendBtn = document.getElementById('send-btn');
-  const history = [];
+const chatArea = document.getElementById('chat-area');
+const inputEl = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const history = [];
 
-  // テキストエリア自動リサイズ
-  inputEl.addEventListener('input', () => {
-    inputEl.style.height = 'auto';
-    inputEl.style.height = inputEl.scrollHeight + 'px';
-    sendBtn.disabled = !inputEl.value.trim();
-  });
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = inputEl.scrollHeight + 'px';
+  sendBtn.disabled = !inputEl.value.trim();
+});
 
-  function suggest(btn) {
-    inputEl.value = btn.textContent;
-    inputEl.dispatchEvent(new Event('input'));
-    send();
+function suggest(btn) {
+  inputEl.value = btn.textContent;
+  inputEl.dispatchEvent(new Event('input'));
+  send();
+}
+
+function now() {
+  return new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMsg(role, text) {
+  const group = document.createElement('div');
+  group.className = `msg-group ${role}`;
+
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = role === 'user' ? `You  ${now()}` : `Assistant  ${now()}`;
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.textContent = text;
+
+  group.appendChild(meta);
+  group.appendChild(bubble);
+  chatArea.appendChild(group);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return bubble;
+}
+
+function addTyping() {
+  const group = document.createElement('div');
+  group.className = 'msg-group ai';
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = 'Assistant';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = '<div class="typing-wrap"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  group.appendChild(meta);
+  group.appendChild(bubble);
+  chatArea.appendChild(group);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return group;
+}
+
+async function send() {
+  const text = inputEl.value.trim();
+  if (!text || sendBtn.disabled) return;
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+
+  const typing = addTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history })
+    });
+    const data = await res.json();
+    typing.remove();
+    if (!res.ok) throw new Error(data.error || 'エラーが発生しました');
+    addMsg('ai', data.answer);
+    history.push({ role: 'assistant', content: data.answer });
+  } catch (e) {
+    typing.remove();
+    const group = document.createElement('div');
+    group.className = 'msg-group ai';
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.textContent = 'Assistant';
+    const err = document.createElement('div');
+    err.className = 'error-msg';
+    err.textContent = e.message;
+    group.appendChild(meta);
+    group.appendChild(err);
+    chatArea.appendChild(group);
   }
 
-  function addMsg(role, content, sources) {
-    const wrap = document.createElement('div');
-    wrap.className = 'msg ' + (role === 'user' ? 'user' : '');
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
 
-    const av = document.createElement('div');
-    av.className = 'avatar ' + (role === 'user' ? 'user' : 'ai');
-    av.textContent = role === 'user' ? '私' : 'AI';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble ' + (role === 'user' ? 'user' : 'ai');
-    bubble.textContent = content;
-
-    if (sources && sources.length) {
-      const src = document.createElement('div');
-      src.className = 'sources';
-      src.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>参照: ${sources.join(', ')}`;
-      bubble.appendChild(src);
-    }
-
-    wrap.appendChild(av);
-    wrap.appendChild(bubble);
-    messagesEl.appendChild(wrap);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    return bubble;
-  }
-
-  function addThinking() {
-    const wrap = document.createElement('div');
-    wrap.className = 'msg';
-    wrap.innerHTML = `<div class="avatar ai">AI</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>`;
-    messagesEl.appendChild(wrap);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    return wrap;
-  }
-
-  async function send() {
-    const text = inputEl.value.trim();
-    if (!text || sendBtn.disabled) return;
-
-    inputEl.value = '';
-    inputEl.style.height = 'auto';
-    sendBtn.disabled = true;
-
-    addMsg('user', text);
-    history.push({ role: 'user', content: text });
-
-    const thinking = addThinking();
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
-      });
-
-      const data = await res.json();
-      thinking.remove();
-
-      if (!res.ok) throw new Error(data.error || '不明なエラー');
-
-      addMsg('assistant', data.answer, data.usedFiles);
-      history.push({ role: 'assistant', content: data.answer });
-
-    } catch (e) {
-      thinking.remove();
-      const wrap = document.createElement('div');
-      wrap.className = 'msg';
-      wrap.innerHTML = `<div class="avatar ai">AI</div><div class="error-bubble">⚠️ エラーが発生しました: ${e.message}</div>`;
-      messagesEl.appendChild(wrap);
-    }
-
-    sendBtn.disabled = false;
-    inputEl.focus();
-  }
-
-  sendBtn.addEventListener('click', send);
-  inputEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-  });
+sendBtn.addEventListener('click', send);
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); send(); }
+});
 </script>
 </body>
 </html>
