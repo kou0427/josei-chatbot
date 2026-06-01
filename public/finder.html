@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>補助金診断 | 補助金ナビ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f2f5f2;
+  --sidebar: #1a2a1e;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --text: #1a2a1e;
+  --text-muted: #6b7c6e;
+  --text-light: #9cad9e;
+  --accent: #2d7a47;
+  --accent-light: #e8f5ec;
+  --accent-mid: #4a9e63;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); }
+#layout { display: flex; height: 100vh; overflow: hidden; }
+
+/* サイドバー（index.htmlと共通） */
+#sidebar {
+  width: 230px; background: var(--sidebar);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; padding: 20px 0;
+}
+.sidebar-logo {
+  padding: 0 18px 20px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 16px;
+}
+.logo-mark {
+  width: 30px; height: 30px; background: var(--accent);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+}
+.logo-mark svg { width: 15px; height: 15px; }
+.logo-name { font-size: 13.5px; font-weight: 500; color: #fff; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.sidebar-section { padding: 0 12px; margin-bottom: 6px; }
+.sidebar-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.5);
+  padding: 0 6px; margin-bottom: 4px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 8px; border-radius: var(--radius-sm);
+  color: rgba(255,255,255,0.5); font-size: 13px;
+  cursor: pointer; transition: background 0.12s, color 0.12s;
+  text-decoration: none;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.sidebar-item.active { background: rgba(45,122,71,0.25); color: #fff; }
+.sidebar-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
+.sidebar-item.active svg { opacity: 1; }
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 18px; }
+.sidebar-bottom { margin-top: auto; padding: 0 12px; }
+.status-badge {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.04);
+  font-size: 11px; color: rgba(255,255,255,0.5);
+}
+.dot-green { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
+
+/* メイン */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#topbar {
+  padding: 13px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+.topbar-left span { color: var(--text); font-weight: 500; }
+.chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 100px; font-size: 11px; color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
+
+/* 診断エリア */
+#finder-area {
+  flex: 1; overflow-y: auto;
+  padding: 40px 24px;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.finder-wrap { width: 100%; max-width: 560px; }
+
+/* プログレスバー */
+.progress-bar-wrap { margin-bottom: 32px; }
+.progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text-muted);
+  font-family: var(--font-mono); margin-bottom: 8px;
+}
+.progress-bar {
+  height: 4px; background: var(--border);
+  border-radius: 100px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+/* ステップカード */
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-eyebrow {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+.step-question {
+  font-size: 20px; font-weight: 500;
+  letter-spacing: -0.02em; line-height: 1.4;
+  margin-bottom: 8px;
+}
+.step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+
+/* 選択肢ボタン */
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice-btn {
+  padding: 13px 16px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--text);
+  cursor: pointer; text-align: left;
+  font-family: var(--font); line-height: 1.45;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+  display: flex; align-items: center; gap: 10px;
+}
+.choice-btn:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.choice-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.choice-icon { font-size: 18px; flex-shrink: 0; }
+
+/* テキスト入力 */
+.text-input-wrap { display: flex; flex-direction: column; gap: 10px; }
+.step-textarea {
+  width: 100%; border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px; font-size: 14px;
+  font-family: var(--font); color: var(--text);
+  background: var(--bg); resize: none;
+  line-height: 1.6; outline: none;
+  transition: border-color 0.15s;
+}
+.step-textarea:focus { border-color: var(--accent); }
+.step-textarea::placeholder { color: var(--text-light); }
+
+/* ナビゲーション */
+.step-nav {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-top: 24px;
+}
+.btn-back {
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent; font-size: 13px;
+  color: var(--text-muted); cursor: pointer;
+  font-family: var(--font);
+  transition: border-color 0.12s, color 0.12s;
+}
+.btn-back:hover { border-color: var(--accent); color: var(--accent); }
+.btn-next {
+  padding: 10px 22px;
+  background: var(--accent); border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px; font-weight: 500;
+  color: white; cursor: pointer;
+  font-family: var(--font);
+  transition: opacity 0.12s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-next:hover { opacity: 0.85; }
+.btn-next:disabled { background: #ccc; cursor: not-allowed; opacity: 1; }
+.btn-next svg { width: 14px; height: 14px; }
+
+/* ローディング */
+.loading-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 48px 32px;
+  text-align: center;
+}
+.loading-icon {
+  width: 48px; height: 48px;
+  border: 3px solid var(--accent-light);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-size: 17px; font-weight: 500; margin-bottom: 6px; }
+.loading-desc { font-size: 13px; color: var(--text-muted); }
+
+/* 結果カード */
+.result-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px;
+  animation: fadeUp 0.3s ease;
+}
+.result-eyebrow {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+.result-title { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 16px; }
+.result-body {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text); white-space: pre-wrap;
+  margin-bottom: 24px;
+}
+.result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-chat {
+  padding: 10px 20px;
+  background: var(--accent); border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px; font-weight: 500;
+  color: white; cursor: pointer;
+  font-family: var(--font); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: opacity 0.12s;
+}
+.btn-chat:hover { opacity: 0.85; }
+.btn-retry {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px; color: var(--text-muted);
+  cursor: pointer; background: transparent;
+  font-family: var(--font);
+  transition: border-color 0.12s, color 0.12s;
+}
+.btn-retry:hover { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 640px) {
+  #sidebar { display: none; }
+  #finder-area { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div id="layout">
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
+          <path d="M8 2L8 14M4 6l4-4 4 4M3 10h10"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">補助金ナビ</div>
+        <div class="logo-sub">片岡 AI Assistant</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">メニュー</div>
+      <a href="/" class="sidebar-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M2 4h12M2 8h8M2 12h10"/>
+        </svg>
+        AIチャット
+      </a>
+      <a href="/finder.html" class="sidebar-item active">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="7" cy="7" r="4"/><path d="M10 10l3 3"/>
+        </svg>
+        補助金診断
+      </a>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="status-badge">
+        <div class="dot-green"></div>
+        最新情報を参照中
+      </div>
+    </div>
+  </aside>
+
+  <div id="main">
+    <div id="topbar">
+      <div class="topbar-left">
+        補助金ナビ <span style="color:var(--text-light)">/</span> <span>補助金診断</span>
+      </div>
+      <div class="chip"><div class="chip-dot"></div>オンライン</div>
+    </div>
+    <div id="finder-area">
+      <div class="finder-wrap" id="finder-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  {
+    id: 'business_type',
+    eyebrow: 'Step 1 / 5',
+    question: '事業の形態を教えてください',
+    desc: '当てはまるものを選んでください。',
+    type: 'choice',
+    choices: [
+      { icon: '🏪', label: '個人事業主・フリーランス' },
+      { icon: '🏢', label: '法人（株式会社・合同会社など）' },
+      { icon: '🌱', label: 'これから開業・創業予定' },
+      { icon: '🤝', label: 'NPO・社団法人など' },
+    ]
+  },
+  {
+    id: 'industry',
+    eyebrow: 'Step 2 / 5',
+    question: '業種を教えてください',
+    desc: '最も近いものを選んでください。',
+    type: 'choice',
+    choices: [
+      { icon: '🍽️', label: '飲食・食品' },
+      { icon: '🛒', label: '小売・EC・サービス' },
+      { icon: '🏗️', label: '建設・不動産・製造' },
+      { icon: '💻', label: 'IT・Web・クリエイティブ' },
+      { icon: '🏥', label: '医療・介護・福祉' },
+      { icon: '📦', label: 'その他・複数業種' },
+    ]
+  },
+  {
+    id: 'purpose',
+    eyebrow: 'Step 3 / 5',
+    question: '補助金を何に使いたいですか？',
+    desc: '主な目的を選んでください（複数該当する場合は最も優先度が高いもの）。',
+    type: 'choice',
+    choices: [
+      { icon: '💡', label: '新しい設備・機械の導入' },
+      { icon: '🖥️', label: 'ITツール・システムの導入' },
+      { icon: '📣', label: '広告・集客・販路拡大' },
+      { icon: '👥', label: '採用・人材育成' },
+      { icon: '🔄', label: '事業承継・M&A' },
+      { icon: '🚀', label: '新規事業・商品開発' },
+    ]
+  },
+  {
+    id: 'employees',
+    eyebrow: 'Step 4 / 5',
+    question: '従業員数を教えてください',
+    desc: '正社員・パート問わず、おおよその人数を選んでください。',
+    type: 'choice',
+    choices: [
+      { icon: '👤', label: '1人（自分のみ）' },
+      { icon: '👥', label: '2〜5人' },
+      { icon: '🏘️', label: '6〜20人' },
+      { icon: '🏙️', label: '21人以上' },
+    ]
+  },
+  {
+    id: 'detail',
+    eyebrow: 'Step 5 / 5',
+    question: '補足があれば教えてください',
+    desc: '地域・予算・お急ぎの締め切りなど、あれば入力してください（任意）。',
+    type: 'text',
+    placeholder: '例：東京都内、予算100万円まで、今月中に申請したい など',
+  }
+];
+
+let currentStep = 0;
+let answers = {};
+
+const wrap = document.getElementById('finder-wrap');
+
+function render() {
+  if (currentStep >= STEPS.length) {
+    showLoading();
+    submitDiagnosis();
+    return;
+  }
+  const step = STEPS[currentStep];
+  const progress = Math.round((currentStep / STEPS.length) * 100);
+
+  wrap.innerHTML = `
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>診断の進捗</span>
+        <span>${progress}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${progress}%"></div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-eyebrow">${step.eyebrow}</div>
+      <div class="step-question">${step.question}</div>
+      <div class="step-desc">${step.desc}</div>
+      ${step.type === 'choice' ? renderChoices(step) : renderText(step)}
+      <div class="step-nav">
+        <button class="btn-back" onclick="goBack()" ${currentStep === 0 ? 'style="visibility:hidden"' : ''}>← 戻る</button>
+        ${step.type === 'text' ? `
+          <button class="btn-next" onclick="goNext()" id="next-btn">
+            ${currentStep === STEPS.length - 1 ? '診断する' : '次へ'}
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </button>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  // 選択肢は選んだら自動で次へ
+  if (step.type === 'choice') {
+    wrap.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        answers[step.id] = btn.dataset.value;
+        setTimeout(goNext, 200);
+      });
+    });
+  }
+}
+
+function renderChoices(step) {
+  return `<div class="choices">${step.choices.map(c => `
+    <button class="choice-btn ${answers[step.id] === c.label ? 'selected' : ''}" data-value="${c.label}">
+      <span class="choice-icon">${c.icon}</span>
+      ${c.label}
+    </button>
+  `).join('')}</div>`;
+}
+
+function renderText(step) {
+  return `<div class="text-input-wrap">
+    <textarea class="step-textarea" id="step-text" rows="3" placeholder="${step.placeholder}">${answers[step.id] || ''}</textarea>
+  </div>`;
+}
+
+function goNext() {
+  const step = STEPS[currentStep];
+  if (step.type === 'text') {
+    const val = document.getElementById('step-text')?.value.trim();
+    answers[step.id] = val || '特になし';
+  }
+  currentStep++;
+  render();
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    render();
+  }
+}
+
+function showLoading() {
+  wrap.innerHTML = `
+    <div class="loading-card">
+      <div class="loading-icon"></div>
+      <div class="loading-title">最適な補助金を探しています</div>
+      <div class="loading-desc">ご回答をもとに、今申請できる補助金・助成金を検索中です...</div>
+    </div>
+  `;
+}
+
+async function submitDiagnosis() {
+  const summary = `
+事業形態: ${answers.business_type}
+業種: ${answers.industry}
+使用目的: ${answers.purpose}
+従業員数: ${answers.employees}
+補足: ${answers.detail}
+  `.trim();
+
+  const prompt = `以下の条件に当てはまる事業者に最適な補助金・助成金を教えてください。\n\n${summary}`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'エラーが発生しました');
+    showResult(data.answer);
+  } catch (e) {
+    wrap.innerHTML = `
+      <div class="result-card">
+        <div class="result-eyebrow">エラー</div>
+        <div class="result-title">取得に失敗しました</div>
+        <div class="result-body">${e.message}</div>
+        <div class="result-actions">
+          <button class="btn-retry" onclick="restart()">もう一度試す</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function showResult(answer) {
+  wrap.innerHTML = `
+    <div class="result-card">
+      <div class="result-eyebrow">診断結果</div>
+      <div class="result-title">あなたにおすすめの補助金・助成金</div>
+      <div class="result-body">${answer}</div>
+      <div class="result-actions">
+        <a href="/" class="btn-chat">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14"><path d="M2 4h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/></svg>
+          片岡にもっと相談する
+        </a>
+        <button class="btn-retry" onclick="restart()">もう一度診断する</button>
+      </div>
+    </div>
+  `;
+}
+
+function restart() {
+  currentStep = 0;
+  answers = {};
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
