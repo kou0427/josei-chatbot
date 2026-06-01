@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>助成金・補助金アシスタント</title>
+<title>補助金ナビ | 片岡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #f4f3f0;
-  --sidebar: #1c1c1e;
+  --bg: #f2f5f2;
+  --sidebar: #1a2a1e;
   --surface: #ffffff;
   --border: rgba(0,0,0,0.08);
-  --text: #1c1c1e;
-  --text-muted: #8a8a8e;
-  --text-light: #aeaeb2;
-  --accent: #5b5bd6;
-  --accent-light: #ededfc;
-  --user-bg: #1c1c1e;
+  --text: #1a2a1e;
+  --text-muted: #6b7c6e;
+  --text-light: #9cad9e;
+  --accent: #2d7a47;
+  --accent-light: #e8f5ec;
+  --accent-mid: #4a9e63;
+  --user-bg: #1a2a1e;
   --user-text: #ffffff;
-  --sidebar-text: rgba(255,255,255,0.55);
+  --sidebar-text: rgba(255,255,255,0.5);
   --sidebar-text-active: #ffffff;
   --sidebar-hover: rgba(255,255,255,0.06);
-  --tag-bg: rgba(255,255,255,0.08);
   --radius: 14px;
   --radius-sm: 8px;
   --font: 'DM Sans', sans-serif;
@@ -33,12 +33,11 @@
 
 html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); }
 
-/* レイアウト */
 #layout { display: flex; height: 100vh; overflow: hidden; }
 
 /* サイドバー */
 #sidebar {
-  width: 220px;
+  width: 230px;
   background: var(--sidebar);
   display: flex;
   flex-direction: column;
@@ -47,55 +46,33 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 }
 
 .sidebar-logo {
-  padding: 0 18px 24px;
+  padding: 0 18px 20px;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
   margin-bottom: 16px;
 }
-
 .logo-mark {
-  width: 28px; height: 28px;
+  width: 30px; height: 30px;
   background: var(--accent);
-  border-radius: 7px;
+  border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.logo-mark svg { width: 14px; height: 14px; }
+.logo-mark svg { width: 15px; height: 15px; }
+.logo-name { font-size: 13.5px; font-weight: 500; color: #fff; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: var(--sidebar-text); margin-top: 2px; }
 
-.logo-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--sidebar-text-active);
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-.logo-sub {
-  font-size: 10px;
-  color: var(--sidebar-text);
-  margin-top: 2px;
-}
-
-.sidebar-section {
-  padding: 0 12px;
-  margin-bottom: 8px;
-}
-
+.sidebar-section { padding: 0 12px; margin-bottom: 6px; }
 .sidebar-label {
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--sidebar-text);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0 6px;
-  margin-bottom: 4px;
+  padding: 0 6px; margin-bottom: 4px;
 }
-
 .sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   padding: 7px 8px;
   border-radius: var(--radius-sm);
   color: var(--sidebar-text);
@@ -105,126 +82,108 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   user-select: none;
 }
 .sidebar-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text-active); }
-.sidebar-item.active { background: rgba(91,91,214,0.18); color: var(--sidebar-text-active); }
+.sidebar-item.active { background: rgba(45,122,71,0.25); color: var(--sidebar-text-active); }
 .sidebar-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
 .sidebar-item.active svg { opacity: 1; }
 
-.sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 12px 18px; }
-
-.sidebar-bottom {
-  margin-top: auto;
-  padding: 0 12px;
+/* 履歴アイテム */
+.history-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+  line-height: 1.4;
 }
+.history-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text-active); }
+.history-item svg { width: 12px; height: 12px; flex-shrink: 0; opacity: 0.5; margin-top: 2px; }
+.history-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-empty { font-size: 11px; color: var(--sidebar-text); padding: 6px 8px; font-style: italic; }
 
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 18px; }
+
+.new-chat-btn {
+  margin: 0 12px 16px;
+  padding: 8px 12px;
+  background: rgba(45,122,71,0.3);
+  border: 1px solid rgba(45,122,71,0.4);
+  border-radius: var(--radius-sm);
+  color: #a8dbb8;
+  font-size: 12.5px;
+  font-family: var(--font);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.12s;
+}
+.new-chat-btn:hover { background: rgba(45,122,71,0.45); }
+.new-chat-btn svg { width: 13px; height: 13px; }
+
+.sidebar-bottom { margin-top: auto; padding: 0 12px; }
 .status-badge {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  display: flex; align-items: center; gap: 7px;
   padding: 8px 8px;
   border-radius: var(--radius-sm);
   background: rgba(255,255,255,0.04);
-  font-size: 11px;
-  color: var(--sidebar-text);
+  font-size: 11px; color: var(--sidebar-text);
 }
-.status-dot-green {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #30d158;
-  flex-shrink: 0;
-}
+.dot-green { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
 
-/* メインエリア */
-#main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--bg);
-}
+/* メイン */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-/* トップバー */
 #topbar {
-  padding: 14px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 13px 24px;
+  display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
 }
-
-.topbar-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.topbar-breadcrumb span { color: var(--text); font-weight: 500; }
-.breadcrumb-sep { color: var(--text-light); }
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+.topbar-left { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+.topbar-left span { color: var(--text); font-weight: 500; }
 .chip {
   display: flex; align-items: center; gap: 5px;
   padding: 4px 10px;
   border: 1px solid var(--border);
   border-radius: 100px;
-  font-size: 11px;
-  color: var(--text-muted);
-  background: var(--surface);
+  font-size: 11px; color: var(--text-muted);
   font-family: var(--font-mono);
 }
-.chip-dot { width: 5px; height: 5px; border-radius: 50%; background: #30d158; }
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
 
 /* チャットエリア */
 #chat-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 32px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex: 1; overflow-y: auto;
+  padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 0;
 }
 
-/* メッセージ */
-.msg-group { margin-bottom: 28px; }
-
+.msg-group { margin-bottom: 24px; }
 .msg-meta {
-  font-size: 11px;
-  color: var(--text-light);
+  font-size: 11px; color: var(--text-light);
   font-family: var(--font-mono);
-  margin-bottom: 6px;
-  padding: 0 4px;
+  margin-bottom: 5px; padding: 0 2px;
 }
 .msg-group.user .msg-meta { text-align: right; }
 
 .msg-bubble {
   display: inline-block;
-  max-width: 72%;
-  padding: 13px 16px;
+  max-width: 74%;
+  padding: 12px 16px;
   border-radius: var(--radius);
-  font-size: 14px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
+  font-size: 14px; line-height: 1.75;
+  white-space: pre-wrap; word-break: break-word;
 }
-
 .msg-group.ai .msg-bubble {
   background: var(--surface);
   border: 1px solid var(--border);
   border-top-left-radius: 4px;
   color: var(--text);
 }
-
 .msg-group.user {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  display: flex; flex-direction: column; align-items: flex-end;
 }
 .msg-group.user .msg-bubble {
   background: var(--user-bg);
@@ -237,39 +196,33 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 28px;
+  padding: 26px;
+  margin-bottom: 0;
 }
 .welcome-eyebrow {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  margin-bottom: 10px;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); font-family: var(--font-mono);
+  margin-bottom: 8px;
 }
-.welcome-title { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 8px; }
-.welcome-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+.welcome-title { font-size: 19px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 6px; }
+.welcome-desc { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 20px; }
 
-.suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .suggestion {
-  padding: 11px 14px;
+  padding: 10px 13px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
-  line-height: 1.45;
-  font-family: var(--font);
-  transition: border-color 0.12s, background 0.12s;
+  font-size: 12.5px; color: var(--text);
+  cursor: pointer; text-align: left;
+  line-height: 1.45; font-family: var(--font);
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
 }
 .suggestion:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
 
 /* タイピング */
-.typing-wrap { display: flex; align-items: center; gap: 5px; padding: 14px 16px; }
+.typing-wrap { display: flex; align-items: center; gap: 5px; padding: 12px 4px; }
 .typing-dot {
   width: 5px; height: 5px; border-radius: 50%;
   background: var(--text-light);
@@ -281,16 +234,13 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* 入力エリア */
 #input-area {
-  padding: 16px 24px 20px;
+  padding: 14px 24px 20px;
   border-top: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
 }
-
 .input-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  display: flex; align-items: flex-end; gap: 8px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -298,168 +248,116 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   transition: border-color 0.15s;
 }
 .input-row:focus-within { border-color: var(--accent); }
-
 #user-input {
-  flex: 1;
-  border: none; outline: none;
+  flex: 1; border: none; outline: none;
   background: transparent;
-  font-size: 13.5px;
-  font-family: var(--font);
-  color: var(--text);
-  resize: none;
-  line-height: 1.5;
-  max-height: 140px;
-  overflow-y: auto;
+  font-size: 13.5px; font-family: var(--font);
+  color: var(--text); resize: none;
+  line-height: 1.5; max-height: 140px; overflow-y: auto;
 }
 #user-input::placeholder { color: var(--text-light); }
-
 #send-btn {
   width: 34px; height: 34px;
   border-radius: var(--radius-sm);
-  border: none;
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
+  border: none; background: var(--accent);
+  color: white; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: opacity 0.12s;
+  flex-shrink: 0; transition: opacity 0.12s;
 }
 #send-btn:hover { opacity: 0.85; }
-#send-btn:disabled { background: var(--border); cursor: not-allowed; }
+#send-btn:disabled { background: #ccc; cursor: not-allowed; }
 #send-btn svg { width: 14px; height: 14px; }
+.input-hint { font-size: 11px; color: var(--text-light); margin-top: 7px; font-family: var(--font-mono); }
 
-.input-hint { font-size: 11px; color: var(--text-light); margin-top: 8px; font-family: var(--font-mono); }
-
-/* エラー */
 .error-msg {
-  background: #fff5f5;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
-  font-size: 13px;
-  display: inline-block;
-  max-width: 72%;
+  background: #fff5f5; border: 1px solid #fecaca;
+  color: #b91c1c; border-radius: var(--radius-sm);
+  padding: 11px 14px; font-size: 13px;
+  display: inline-block; max-width: 74%;
 }
 
 @media (max-width: 640px) {
   #sidebar { display: none; }
   .suggestions { grid-template-columns: 1fr; }
-  .msg-bubble { max-width: 88%; }
+  .msg-bubble { max-width: 90%; }
 }
 </style>
 </head>
 <body>
 <div id="layout">
 
-  <!-- サイドバー -->
   <aside id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-mark">
         <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
-          <path d="M2 4h12M2 8h8M2 12h10"/>
+          <path d="M8 2L8 14M4 6l4-4 4 4M3 10h10"/>
         </svg>
       </div>
       <div>
         <div class="logo-name">補助金ナビ</div>
-        <div class="logo-sub">AI Assistant</div>
+        <div class="logo-sub">片岡 AI Assistant</div>
       </div>
     </div>
+
+    <button class="new-chat-btn" onclick="newChat()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M8 3v10M3 8h10"/>
+      </svg>
+      新しい相談を始める
+    </button>
 
     <div class="sidebar-section">
       <div class="sidebar-label">メニュー</div>
       <div class="sidebar-item active">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <path d="M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z"/>
+          <path d="M2 4h12M2 8h8M2 12h10"/>
         </svg>
         AIチャット
-      </div>
-      <div class="sidebar-item">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <rect x="2" y="2" width="12" height="12" rx="2"/>
-          <path d="M5 8h6M5 5h3M5 11h4"/>
-        </svg>
-        補助金一覧
-      </div>
-      <div class="sidebar-item">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
-        </svg>
-        締め切り管理
       </div>
     </div>
 
     <div class="sidebar-divider"></div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">履歴</div>
-      <div class="sidebar-item">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <path d="M3 4h10M3 8h7M3 12h8"/>
-        </svg>
-        小規模事業者の補助金
-      </div>
-      <div class="sidebar-item">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <path d="M3 4h10M3 8h7M3 12h8"/>
-        </svg>
-        IT導入補助金について
+    <div class="sidebar-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <div class="sidebar-label">最近の相談</div>
+      <div id="history-list" style="overflow-y:auto;flex:1;">
+        <div class="history-empty">まだ履歴はありません</div>
       </div>
     </div>
 
     <div class="sidebar-bottom">
       <div class="status-badge">
-        <div class="status-dot-green"></div>
-        最新データ同期済み
+        <div class="dot-green"></div>
+        最新情報を参照中
       </div>
     </div>
   </aside>
 
-  <!-- メイン -->
   <div id="main">
     <div id="topbar">
-      <div class="topbar-breadcrumb">
+      <div class="topbar-left">
         補助金ナビ
-        <span class="breadcrumb-sep">/</span>
-        <span>AIチャット</span>
+        <span style="color:var(--text-light)">/</span>
+        <span>片岡との相談</span>
       </div>
-      <div class="topbar-right">
-        <div class="chip">
-          <div class="chip-dot"></div>
-          v1.0
-        </div>
+      <div class="chip">
+        <div class="chip-dot"></div>
+        オンライン
       </div>
     </div>
 
-    <div id="chat-area">
-      <div class="msg-group ai">
-        <div class="msg-meta">Assistant</div>
-        <div class="msg-bubble">
-          <div class="welcome-card">
-            <div class="welcome-eyebrow">AI Assistant</div>
-            <div class="welcome-title">助成金・補助金を探しましょう</div>
-            <div class="welcome-desc">Google Driveの最新データをもとに、あなたの状況に合った補助金・助成金をご案内します。業種や目的を教えてください。</div>
-            <div class="suggestions">
-              <button class="suggestion" onclick="suggest(this)">小規模事業者向けの補助金を教えて</button>
-              <button class="suggestion" onclick="suggest(this)">今月締め切りの助成金は？</button>
-              <button class="suggestion" onclick="suggest(this)">IT導入に使える補助金は？</button>
-              <button class="suggestion" onclick="suggest(this)">飲食店が使える支援制度を教えて</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="chat-area"></div>
 
     <div id="input-area">
       <div class="input-row">
-        <textarea id="user-input" placeholder="業種や目的を教えてください..." rows="1"></textarea>
+        <textarea id="user-input" placeholder="業種・目的・地域などを教えてください..." rows="1"></textarea>
         <button id="send-btn" disabled aria-label="送信">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2L7 9M14 2L9 14l-2-5-5-2 12-5z"/>
           </svg>
         </button>
       </div>
-      <div class="input-hint">Shift + Enter で送信 &nbsp;/&nbsp; Enter で改行</div>
+      <div class="input-hint">Shift + Enter で送信　/　Enter で改行</div>
     </div>
   </div>
 </div>
@@ -468,7 +366,102 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 const chatArea = document.getElementById('chat-area');
 const inputEl = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
-const history = [];
+const historyList = document.getElementById('history-list');
+
+// セッション管理
+let sessions = JSON.parse(localStorage.getItem('chat_sessions') || '[]');
+let currentSessionId = null;
+let currentHistory = [];
+
+function newChat() {
+  currentSessionId = Date.now().toString();
+  currentHistory = [];
+  chatArea.innerHTML = '';
+  showWelcome();
+}
+
+function showWelcome() {
+  const group = document.createElement('div');
+  group.className = 'msg-group ai';
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = '片岡';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-eyebrow">補助金・助成金サポート</div>
+      <div class="welcome-title">こんにちは、補助金・助成金サポートの片岡です</div>
+      <div class="welcome-desc">業種や目的をお聞かせいただければ、今申請できる補助金・助成金をご案内します。どんな些細なことでもお気軽にどうぞ。</div>
+      <div class="suggestions">
+        <button class="suggestion" onclick="suggest(this)">小規模事業者向けの補助金を教えて</button>
+        <button class="suggestion" onclick="suggest(this)">今月締め切りの助成金は？</button>
+        <button class="suggestion" onclick="suggest(this)">IT導入に使える補助金は？</button>
+        <button class="suggestion" onclick="suggest(this)">飲食店が使える支援制度を教えて</button>
+      </div>
+    </div>
+  `;
+  group.appendChild(meta);
+  group.appendChild(bubble);
+  chatArea.appendChild(group);
+}
+
+function saveSession(firstQuestion) {
+  const existing = sessions.findIndex(s => s.id === currentSessionId);
+  const session = {
+    id: currentSessionId,
+    title: firstQuestion.slice(0, 24) + (firstQuestion.length > 24 ? '…' : ''),
+    updatedAt: Date.now(),
+  };
+  if (existing >= 0) {
+    sessions[existing] = session;
+  } else {
+    sessions.unshift(session);
+  }
+  if (sessions.length > 20) sessions = sessions.slice(0, 20);
+  localStorage.setItem('chat_sessions', JSON.stringify(sessions));
+  renderHistory();
+}
+
+function renderHistory() {
+  if (sessions.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">まだ履歴はありません</div>';
+    return;
+  }
+  historyList.innerHTML = sessions.map(s => `
+    <div class="history-item" onclick="loadSession('${s.id}')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M2 4h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
+      </svg>
+      <span class="history-text">${s.title}</span>
+    </div>
+  `).join('');
+}
+
+function loadSession(id) {
+  const session = sessions.find(s => s.id === id);
+  if (!session) return;
+  const stored = JSON.parse(localStorage.getItem('session_' + id) || 'null');
+  if (!stored) return;
+  currentSessionId = id;
+  currentHistory = stored.history || [];
+  chatArea.innerHTML = '';
+  showWelcome();
+  stored.messages.forEach(m => {
+    addMsgDOM(m.role, m.text);
+  });
+}
+
+// セッションのメッセージ保存
+let sessionMessages = [];
+
+function saveMsgToSession(role, text) {
+  sessionMessages.push({ role, text });
+  localStorage.setItem('session_' + currentSessionId, JSON.stringify({
+    history: currentHistory,
+    messages: sessionMessages,
+  }));
+}
 
 inputEl.addEventListener('input', () => {
   inputEl.style.height = 'auto';
@@ -486,23 +479,19 @@ function now() {
   return new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
 }
 
-function addMsg(role, text) {
+function addMsgDOM(role, text) {
   const group = document.createElement('div');
-  group.className = `msg-group ${role}`;
-
+  group.className = 'msg-group ' + (role === 'user' ? 'user' : 'ai');
   const meta = document.createElement('div');
   meta.className = 'msg-meta';
-  meta.textContent = role === 'user' ? `You  ${now()}` : `Assistant  ${now()}`;
-
+  meta.textContent = role === 'user' ? `あなた  ${now()}` : `片岡  ${now()}`;
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
   bubble.textContent = text;
-
   group.appendChild(meta);
   group.appendChild(bubble);
   chatArea.appendChild(group);
   chatArea.scrollTop = chatArea.scrollHeight;
-  return bubble;
 }
 
 function addTyping() {
@@ -510,7 +499,7 @@ function addTyping() {
   group.className = 'msg-group ai';
   const meta = document.createElement('div');
   meta.className = 'msg-meta';
-  meta.textContent = 'Assistant';
+  meta.textContent = '片岡';
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
   bubble.innerHTML = '<div class="typing-wrap"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
@@ -528,8 +517,18 @@ async function send() {
   inputEl.style.height = 'auto';
   sendBtn.disabled = true;
 
-  addMsg('user', text);
-  history.push({ role: 'user', content: text });
+  // 最初のメッセージならセッション作成
+  if (!currentSessionId) {
+    currentSessionId = Date.now().toString();
+    sessionMessages = [];
+  }
+  if (currentHistory.length === 0) {
+    saveSession(text);
+  }
+
+  addMsgDOM('user', text);
+  saveMsgToSession('user', text);
+  currentHistory.push({ role: 'user', content: text });
 
   const typing = addTyping();
 
@@ -537,20 +536,22 @@ async function send() {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: history })
+      body: JSON.stringify({ messages: currentHistory })
     });
     const data = await res.json();
     typing.remove();
     if (!res.ok) throw new Error(data.error || 'エラーが発生しました');
-    addMsg('ai', data.answer);
-    history.push({ role: 'assistant', content: data.answer });
+    addMsgDOM('ai', data.answer);
+    saveMsgToSession('ai', data.answer);
+    currentHistory.push({ role: 'assistant', content: data.answer });
+    saveSession(text);
   } catch (e) {
     typing.remove();
     const group = document.createElement('div');
     group.className = 'msg-group ai';
     const meta = document.createElement('div');
     meta.className = 'msg-meta';
-    meta.textContent = 'Assistant';
+    meta.textContent = '片岡';
     const err = document.createElement('div');
     err.className = 'error-msg';
     err.textContent = e.message;
@@ -567,6 +568,10 @@ sendBtn.addEventListener('click', send);
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); send(); }
 });
+
+// 初期化
+renderHistory();
+newChat();
 </script>
 </body>
 </html>
